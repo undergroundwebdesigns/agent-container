@@ -1,0 +1,26 @@
+### Functions for setting and getting environment variables from the OSX keychain ###
+### Adapted from: https://www.netmeister.org/blog/keychain-passwords.html and
+### https://gist.github.com/bmhatfield/f613c10e360b4f27033761bbee4404fd
+
+CLAUDE_TOKEN_SECRET_NAME="CLAUDE_GITHUB_TOKEN"
+DATADOG_API_KEY_SECRET_NAME="DD_API_KEY"
+DATADOG_APP_KEY_SECRET_NAME="DD_APP_KEY"
+
+# Use: get-keychain-secret SECRET_ENV_VAR
+function get-keychain-secret () {
+    security find-generic-password -w -a ${USER} -D "environment variable" -s "${1}"
+}
+
+# Use: set-keychain-secret SECRET_ENV_VAR
+# You will be prompted to enter the secret value!
+function set-keychain-secret () {
+    [ -n "$1" ] || print "Missing environment variable name"
+
+    # prompt user for secret
+    echo -n "Enter secret for ${1}"
+    read secret
+    [ -n "$secret" ] || return 1
+
+    ( [ -n "$1" ] || [ -n "$secret" ] ) || return 1
+    security add-generic-password -U -a ${USER} -D "environment variable" -s "${1}" -w "${secret}"
+}

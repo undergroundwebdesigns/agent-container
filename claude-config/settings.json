@@ -1,0 +1,19 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.local/bin/statusline"
+  },
+  "enabledPlugins": {
+    "feature-dev@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  },
+  "mcpServers": {
+    "chrome-devtools": {
+      "type": "sse",
+      "url": "http://chrome-devtools-mcp:8100/sse"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+services:
+  claude:
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile
+      args:
+        TZ: ${TZ:-America/Los_Angeles}
+        CLAUDE_CODE_VERSION: latest
+        GIT_DELTA_VERSION: "0.18.2"
+        ZSH_IN_DOCKER_VERSION: "1.2.0"
+        USERNAME: "claude"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    user: claude
+    working_dir: /workspace
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./workspace:/workspace:delegated
+      - ./claude-config:/claude-config
+      - asdf-state:/home/claude/.asdf
+      - claude-code-bashhistory:/commandhistory
+      - claude-code-config:/home/claude/.claude
+    stdin_open: true
+    tty: true
+    networks:
+      - local-mcp-servers_agents
+
+secrets:
+  github_api_key:
+    environment: CLAUDE_GH_API_KEY
+
+volumes:
+  claude-code-bashhistory:
+  claude-code-config:
+  asdf-state:
+
+networks:
+  local-mcp-servers_agents:
+    external: true
