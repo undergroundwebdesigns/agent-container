@@ -15,5 +15,22 @@
       "type": "sse",
       "url": "http://chrome-devtools-mcp:8100/sse"
     }
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "skipDangerousModePermissionPrompt": true
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/claude/.claude/hooks/block-lockfile-edits.sh"
+          }
+        ]
+      }
+    ]
   }
 }

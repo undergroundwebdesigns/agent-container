@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y git build-essential libssl-dev zlib1g-d
 RUN asdf plugin add ruby
 RUN asdf plugin add nodejs
 RUN asdf plugin add pnpm
+RUN asdf plugin add python
 
 FROM buildpack-deps@sha256:f9316c98dd22c69ebfc8ff437381504bf654d9ce1f18d2b637b5af7dd05cde55
 
@@ -128,14 +129,30 @@ RUN asdf install ruby 4.0.1
 USER root
 
 RUN mkdir -p /home/$USERNAME/bin
-COPY ./bin/statusline /home/$USERNAME/.local/bin/statusline
+COPY ./.devcontainer/./bin/statusline /home/$USERNAME/.local/bin/statusline
 RUN chmod +x /home/$USERNAME/.local/bin/statusline
+
+
+COPY ./claude-config/claude.json /home/claude/.claude/.claude.json
+RUN chmod 444 /home/claude/.claude/.claude.json
+COPY ./claude-config/.gitconfig /home/claude/.gitconfig
+RUN chmod 444 /home/claude/.gitconfig
+
+COPY ./claude-config/settings.json /home/claude/.claude/settings.json
+RUN chmod 444 /home/claude/.claude/settings.json
+COPY ./claude-config/CLAUDE.md /home/claude/.claude/CLAUDE.md
+RUN chmod 444 /home/claude/.claude/CLAUDE.md
+
+#COPY ./claude-config/commands /home/claude/.claude/commands
+#RUN chmod 444 /home/claude/.claude/commands
+COPY ./claude-config/agents/* /home/claude/.claude/agents/
+RUN chmod 444 /home/claude/.claude/agents
 
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 # Copy and set up firewall script + entrypoint
-COPY init-firewall.sh /usr/local/bin/
-COPY entrypoint.sh /usr/local/bin/
+COPY ./.devcontainer/init-firewall.sh /usr/local/bin/
+COPY ./.devcontainer/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-firewall.sh /usr/local/bin/entrypoint.sh && \
   echo "$USERNAME ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
   chmod 0440 /etc/sudoers.d/node-firewall
@@ -155,4 +172,4 @@ SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["claude", "--dangerously-skip-permissions"]
+CMD ["claude"]

@@ -73,6 +73,9 @@ for domain in \
     "cache.ruby-lang.org" \
     "rubygems.org" \
     "nodejs.org" \
+    "www.python.org" \
+    "pypi.org" \
+    "hub.getdbt.com" \
     "releases.hashicorp.com" \
     "hashicorp.com" \
     "mcp.linear.app" \
@@ -94,7 +97,9 @@ for domain in \
             exit 1
         fi
         echo "Adding $ip for $domain"
-        ipset add allowed-domains "$ip"
+        if [[ ! $(ipset add allowed-domains "$ip") ]]; then
+          echo "Failed to add ip $ip"
+        fi
     done < <(echo "$ips")
 done
 

@@ -3,8 +3,12 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source $SCRIPT_DIR/lib
 
-if [ "$1" = "force" ] || [ "$(get-keychain-secret $CLAUDE_TOKEN_SECRET_NAME)" = "" ]; then
-  set-keychain-secret $CLAUDE_TOKEN_SECRET_NAME
+if [ "$1" = "force" ] || [ "$(get-keychain-secret $GITHUB_TOKEN)" = "" ]; then
+  set-keychain-secret $GITHUB_TOKEN
+fi
+
+if [ "$1" = "force" ] || [ "$(get-keychain-secret $GITHUB_PACKAGES_TOKEN)" = "" ]; then
+  set-keychain-secret $GITHUB_PACKAGES_TOKEN
 fi
 
 if [ "$1" = "force" ] || [ "$(get-keychain-secret $DATADOG_API_KEY_SECRET_NAME)" = "" ]; then

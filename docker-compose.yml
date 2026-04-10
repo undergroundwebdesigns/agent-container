@@ -1,8 +1,7 @@
 services:
   claude:
     build:
-      context: .devcontainer
-      dockerfile: Dockerfile
+      dockerfile: .devcontainer/Dockerfile
       args:
         TZ: ${TZ:-America/Los_Angeles}
         CLAUDE_CODE_VERSION: latest
@@ -18,7 +17,7 @@ services:
       - "8080:8080"
     volumes:
       - ./workspace:/workspace:delegated
-      - ./claude-config:/claude-config
+      - ./claude-config:/claude-config:ro
       - asdf-state:/home/claude/.asdf
       - claude-code-bashhistory:/commandhistory
       - claude-code-config:/home/claude/.claude
