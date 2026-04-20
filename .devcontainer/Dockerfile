@@ -43,7 +43,7 @@ FROM buildpack-deps@sha256:f9316c98dd22c69ebfc8ff437381504bf654d9ce1f18d2b637b5a
 
 ARG TZ
 
-ARG CLAUDE_CODE_VERSION=latest
+ARG CLAUDE_CODE_VERSION=2.1.112
 ARG USERNAME=claude
 
 # Install basic development tools and iptables/ipset
@@ -95,8 +95,6 @@ RUN eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
     brew tap datadog-labs/pack && \
     brew install datadog-labs/pack/pup
 
-# Install Claude
-RUN curl -fsSL https://claude.ai/install.sh | bash
 USER root
 
 RUN mkdir /plugins/
@@ -126,6 +124,8 @@ RUN pnpm install skills && \
 RUN asdf install ruby 3.2.1
 RUN asdf install ruby 4.0.1
 
+# Install Claude
+RUN echo $CLAUDE_CODE_VERSION && curl -fsSL https://claude.ai/install.sh | bash
 USER root
 
 RUN mkdir -p /home/$USERNAME/bin
@@ -146,7 +146,7 @@ RUN chmod 444 /home/claude/.claude/CLAUDE.md
 #COPY ./claude-config/commands /home/claude/.claude/commands
 #RUN chmod 444 /home/claude/.claude/commands
 COPY ./claude-config/agents/* /home/claude/.claude/agents/
-RUN chmod 444 /home/claude/.claude/agents
+RUN chmod 444 /home/claude/.claude/agents/*
 
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
@@ -155,7 +155,9 @@ COPY ./.devcontainer/init-firewall.sh /usr/local/bin/
 COPY ./.devcontainer/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-firewall.sh /usr/local/bin/entrypoint.sh && \
   echo "$USERNAME ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
-  chmod 0440 /etc/sudoers.d/node-firewall
+  echo "$USERNAME ALL=(root) NOPASSWD: cp --remove-destination -rs /claude-config/* ~/.claude/" > /etc/sudoers.d/copy-configs && \
+  chmod 0440 /etc/sudoers.d/node-firewall && \
+  chmod 0440 /etc/sudoers.d/copy-configs
 
 # Set ENV vars:
 ENV TZ="$TZ"
