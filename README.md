@@ -1,3 +1,6 @@
+## DISCLAIMER: 
+This is very much a work in progress. No guarantees are made about it's suitablity or completeness for any purpose. Use at your own risk. All rights reserved by the author.
+
 # Claude Code Sandbox
 
 Sandboxed container for running Claude Code headless/agentic, based on the [Anthropic reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer).
