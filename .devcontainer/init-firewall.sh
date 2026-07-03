@@ -63,6 +63,26 @@ while read -r cidr; do
     ipset add allowed-domains "$cidr"
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
+# Load Azure Blob Storage IP ranges from static CIDR list
+AZURE_CIDRS_FILE="/usr/local/share/azure-storage-cidrs.txt"
+if [ ! -f "$AZURE_CIDRS_FILE" ]; then
+    echo "ERROR: Azure Storage CIDRs file not found at $AZURE_CIDRS_FILE"
+    exit 1
+fi
+
+echo "Loading Azure Blob Storage IP ranges..."
+azure_count=0
+while read -r cidr; do
+    [[ "$cidr" =~ ^#.*$ || -z "$cidr" ]] && continue
+    if [[ ! "$cidr" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+        echo "ERROR: Invalid CIDR range from Azure Storage CIDRs: $cidr"
+        exit 1
+    fi
+    ipset add allowed-domains "$cidr" -exist
+    azure_count=$((azure_count + 1))
+done < "$AZURE_CIDRS_FILE"
+echo "Added $azure_count Azure Blob Storage CIDR ranges"
+
 # Resolve and add other allowed domains
 for domain in \
     "shopify.dev" \
@@ -82,7 +102,7 @@ for domain in \
     "registry.npmjs.org" \
     "api.anthropic.com" \
     "sentry.io" \
-    "statsig.anthropic.com" \
+    "docs.litellm.ai" \
     "statsig.com"; do
     echo "Resolving $domain..."
     ips=$(dig +noall +answer A "$domain" | awk '$4 == "A" {print $5}')

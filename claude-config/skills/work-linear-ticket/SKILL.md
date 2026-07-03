@@ -116,7 +116,7 @@ Now that you have the ticket details, do a thorough investigation:
    ```
 
 5. **Save the plan locally**: Write the plan to a file at
-   `/home/claude/.claude/plans/[ticket-id]-plan.md`.
+   `/workspace/plans/[ticket-id]-plan.md`.
 
 6. **Run the plan reviewer**: Use the Task tool with `subagent_type: "plan-reviewer"`
    to review the plan. Incorporate any feedback from the reviewer into the plan

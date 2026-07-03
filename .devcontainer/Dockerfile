@@ -43,8 +43,17 @@ FROM buildpack-deps@sha256:f9316c98dd22c69ebfc8ff437381504bf654d9ce1f18d2b637b5a
 
 ARG TZ
 
-ARG CLAUDE_CODE_VERSION=2.1.112
 ARG USERNAME=claude
+
+RUN apt-get update && apt-get install -y ca-certificates curl
+
+RUN install -m 0755 -d /etc/apt/keyrings \
+  && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
+  && chmod a+r /etc/apt/keyrings/docker.asc \
+  && echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install basic development tools and iptables/ipset
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -66,9 +75,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   nano \
   tmux \
   vim \
+  postgresql \
+  docker-ce-cli docker-compose-plugin \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m $USERNAME
+ENV HOMEBREW_NO_SANDBOX_LINUX=1
 ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/.asdf/bin:/home/$USERNAME/.asdf/shims:$PATH"
 
 # Persist bash history.
@@ -125,7 +137,9 @@ RUN asdf install ruby 3.2.1
 RUN asdf install ruby 4.0.1
 
 # Install Claude
-RUN echo $CLAUDE_CODE_VERSION && curl -fsSL https://claude.ai/install.sh | bash
+ARG CLAUDE_CODE_VERSION=2.1.176
+ENV CLAUDE_CODE_VERSION=${CLAUDE_CODE_VERSION}
+RUN curl -fsSL https://claude.ai/install.sh | bash -s $CLAUDE_CODE_VERSION
 USER root
 
 RUN mkdir -p /home/$USERNAME/bin
@@ -152,6 +166,7 @@ RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 # Copy and set up firewall script + entrypoint
 COPY ./.devcontainer/init-firewall.sh /usr/local/bin/
+COPY ./.devcontainer/azure-storage-cidrs.txt /usr/local/share/azure-storage-cidrs.txt
 COPY ./.devcontainer/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-firewall.sh /usr/local/bin/entrypoint.sh && \
   echo "$USERNAME ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \

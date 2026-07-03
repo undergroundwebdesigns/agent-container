@@ -4,7 +4,6 @@ services:
       dockerfile: .devcontainer/Dockerfile
       args:
         TZ: ${TZ:-America/Los_Angeles}
-        CLAUDE_CODE_VERSION: latest
         GIT_DELTA_VERSION: "0.18.2"
         ZSH_IN_DOCKER_VERSION: "1.2.0"
         USERNAME: "claude"
@@ -21,8 +20,17 @@ services:
       - asdf-state:/home/claude/.asdf
       - claude-code-bashhistory:/commandhistory
       - claude-code-config:/home/claude/.claude
+    environment:
+      - DOCKER_HOST=socat:2375
     stdin_open: true
     tty: true
+    networks:
+      - local-mcp-servers_agents
+  socat:
+    image: alpine/socat
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - local-mcp-servers_agents
 

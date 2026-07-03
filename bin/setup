@@ -7,6 +7,10 @@ if [ "$1" = "force" ] || [ "$(get-keychain-secret $GITHUB_TOKEN)" = "" ]; then
   set-keychain-secret $GITHUB_TOKEN
 fi
 
+if [ "$1" = "force" ] || [ "$(get-keychain-secret $GITHUB_TOKEN_EXTRAS)" = "" ]; then
+  set-keychain-secret $GITHUB_TOKEN_EXTRAS
+fi
+
 if [ "$1" = "force" ] || [ "$(get-keychain-secret $GITHUB_PACKAGES_TOKEN)" = "" ]; then
   set-keychain-secret $GITHUB_PACKAGES_TOKEN
 fi
