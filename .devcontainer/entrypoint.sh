@@ -13,8 +13,8 @@ fi
 # 4. Execute the command inside tmux
 # If no command is passed ($@ is empty), default to an interactive bash shell
 if [ $# -eq 0 ]; then
-  exec tmux -u new-session -s "claude" /bin/bash
+  exec /bin/bash
 else
   # Wrap the CMD arguments so tmux runs them as a single command string
-  exec tmux -u new-session -s "claude" "/bin/bash -c \"$*\""
+  exec $*
 fi

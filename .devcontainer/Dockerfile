@@ -55,6 +55,9 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+RUN curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
+  && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list
+
 # Install basic development tools and iptables/ipset
 RUN apt-get update && apt-get install -y --no-install-recommends \
   less \
@@ -73,11 +76,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   aggregate \
   jq \
   nano \
-  tmux \
   vim \
   postgresql \
+  glow \
   docker-ce-cli docker-compose-plugin \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install herdr
+RUN curl -L -o /tmp/herdr https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-linux-x86_64
+RUN cp /tmp/herdr /usr/local/bin/herdr
+RUN chmod +x /usr/local/bin/herdr
 
 RUN useradd -m $USERNAME
 ENV HOMEBREW_NO_SANDBOX_LINUX=1
@@ -135,6 +143,7 @@ RUN pnpm install skills && \
 
 RUN asdf install ruby 3.2.1
 RUN asdf install ruby 4.0.1
+RUN asdf install python 3.13.0
 
 # Install Claude
 ARG CLAUDE_CODE_VERSION=2.1.176
@@ -183,10 +192,10 @@ ENV HISTFILE=/commandhistory/.bash_history
 ENV DEVCONTAINER=true
 ENV CLAUDE_CONFIG_DIR="/home/${USERNAME}/.claude"
 ENV TERM=xterm-256color
+ENV CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1
 
 USER $USERNAME
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["claude"]

@@ -22,6 +22,11 @@ services:
       - claude-code-config:/home/claude/.claude
     environment:
       - DOCKER_HOST=socat:2375
+      - GITHUB_TOKEN
+      - GITHUB_TOKEN_EXTRAS
+      - GITHUB_PACKAGES_TOKEN
+      - DD_API_KEY
+      - DD_APP_KEY
     stdin_open: true
     tty: true
     networks:
