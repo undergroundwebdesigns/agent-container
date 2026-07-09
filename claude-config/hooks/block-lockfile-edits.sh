@@ -58,4 +58,17 @@ for lockfile in "${LOCKFILES[@]}"; do
   fi
 done
 
+GENERATED_FILES=(
+  # Rails schema
+  "schema.rb"
+  "structure.sql"
+)
+
+for generated in "${GENERATED_FILES[@]}"; do
+  if [[ "$BASENAME" == "$generated" ]]; then
+    echo "Blocked: '$FILE_PATH' is an auto-generated file and must not be edited directly. Run the generator (e.g. a migration) instead." >&2
+    exit 2
+  fi
+done
+
 exit 0

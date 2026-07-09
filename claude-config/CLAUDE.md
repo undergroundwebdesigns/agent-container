@@ -31,12 +31,6 @@ Any time you're asked to create a plan for a large change (refactor, new feature
 
 Whenever you spawn agent teams to perform work, create separate Git worktrees for each agent and have each agent use it's own worktree so that they don't collide. If an agent isn't expected to change anything (e.g. they're just doing reviews) they don't need a worktree.
 
-# Git
-
-_NEVER_ use git force push under any cirucmstance.
-
-_NEVER_ rebase anything, under any circumstances.
-
 # Github
 
 Always open draft PR's unless explicitly instructed otherwise, and assign the user as the PR owner.
@@ -44,7 +38,3 @@ Always open draft PR's unless explicitly instructed otherwise, and assign the us
 Never merge or close PRs unelss explicitly instructed to do so.
 
 NEVER write comments unless explicitly asked to do so. Asking you to address a review does not grant permission to leave comments.
-
-# NPM
-
-Always use pnpm, pnpx, etc. Never use npm or npx directly, they're insecure.

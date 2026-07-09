@@ -18,7 +18,12 @@
     }
   },
   "permissions": {
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Bash(npm)",
+      "Bash(npm *)",
+      "Bash(npx *)"
+    ]
   },
   "skipDangerousModePermissionPrompt": true,
   "hooks": {
@@ -29,6 +34,24 @@
           {
             "type": "command",
             "command": "/home/claude/.claude/hooks/block-lockfile-edits.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/claude/.claude/hooks/guard-bash-commands.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Read|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/claude/.claude/hooks/select-repo-instructions.sh"
           }
         ]
       }
