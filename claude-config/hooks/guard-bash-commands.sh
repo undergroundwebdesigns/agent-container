@@ -31,6 +31,19 @@ if echo "$CMD" | grep -Eq '\bgit\b.+\bremote\b.+\bset-url\b.+\borigin\b'; then
   block "rewriting the 'origin' remote is not allowed; keep the user's origin and pass auth via a credential helper / ENV."
 fi
 
+# persisting auth/URL rewrites into repo-local .git/config (shared with the user's machine)
+if echo "$CMD" | grep -Eq '\bgit\b.+\bconfig\b'; then
+  # reads and cleanup are fine; only writes of sensitive keys are blocked
+  if ! echo "$CMD" | grep -Eq -- '--get|--list|--unset|--remove-section'; then
+    # the sandbox's own --global/--system/--file config is the sanctioned place for persistent auth
+    if ! echo "$CMD" | grep -Eq -- '--global|--system|--file'; then
+      if echo "$CMD" | grep -Eiq -- 'insteadof|credential\.([^[:space:]]*\.)?helper|remote\.origin\.url'; then
+        block "do not persist auth/URL rewrites into repo-local .git/config (insteadOf, credential.helper, remote.origin.url); .git/config is shared with the user's machine. Pass auth inline on the single command via 'git -c <key>=<val> ...', or use the sandbox's own --global includeIf config."
+      fi
+    fi
+  fi
+fi
+
 if echo "$CMD" | grep -Eq '\bgit\b'; then
   # credentials embedded in a URL: https://user:token@host
   if echo "$CMD" | grep -Eq 'https?://[^/[:space:]]+:[^/@[:space:]]+@'; then

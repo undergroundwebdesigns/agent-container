@@ -55,7 +55,9 @@ enforced deterministically.
 - **`guard-bash-commands.sh`** (Bash) — blocks irreversible or policy-violating shell
   commands: git force-push (any spelling), `git rebase`, rewriting the `origin` remote,
   credentials embedded/interpolated into a git URL, `GITHUB_PACKAGES_TOKEN` used for git ops,
-  and supply-chain bypass flags (`--no-verify`, `--no-audit`, weakened `minimumReleaseAge`).
+  supply-chain bypass flags (`--no-verify`, `--no-audit`, weakened `minimumReleaseAge`), and
+  `git config` writes that persist auth/URL rewrites (`insteadOf`, `credential.helper`,
+  `remote.origin.url`) into a repo's shared `.git/config` (pass auth inline via `git -c ...`).
 - `npm`/`npx` are blocked via `permissions.deny` in `settings.json` (use `pnpm`/`pnpx`).
 
 ### Per-repo instructions (`claude-config/repo-notes/`)
