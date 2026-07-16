@@ -27,6 +27,18 @@
   },
   "skipDangerousModePermissionPrompt": true,
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/claude/.claude/hooks/workspace-repo-audit.sh",
+            "timeout": 180,
+            "statusMessage": "Auditing /workspace git repos (branch + behind main)..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write|NotebookEdit",
