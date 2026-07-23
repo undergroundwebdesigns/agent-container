@@ -9,6 +9,14 @@ INPUT=$(cat)
 CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [[ -z "$CMD" ]] && exit 0
 
+# Collapse all whitespace (including the newlines a `\`-continued command
+# carries) to single spaces before matching. The checks below are line-oriented
+# greps where `.*`/`.+` can't span a newline, so a command that splits a guarded
+# verb pair across lines — e.g. `git ... \<newline>    push --force` — would
+# otherwise leave `git` and `push` on separate lines and slip past every
+# `git ... <verb>` guard.
+CMD=$(printf '%s' "$CMD" | tr -s '[:space:]' ' ')
+
 block() {
   echo "Blocked: $1" >&2
   exit 2
