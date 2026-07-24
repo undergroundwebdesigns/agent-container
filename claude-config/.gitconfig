@@ -1,7 +1,18 @@
-# This is Git's per-user configuration file.
 [user]
 	email = alex.willemsma@smile.io
 	name = Alex Willemsma
-# Please adapt and uncomment the following lines:
-#	name = Alex Willemsma
-#	email = alex.willemsma@smile.io
+
+# github.com auth is routed per-org by git-credential-smile-router:
+# smile-io-extras -> $GITHUB_TOKEN_EXTRAS, everything else -> $GITHUB_TOKEN.
+# useHttpPath makes git pass the org as the leading path segment so the
+# helper can tell them apart.
+[credential "https://github.com"]
+	useHttpPath = true
+	helper = /usr/local/bin/git-credential-smile-router
+
+# Rewrite SSH-form github remotes to https so they auth through the helper
+# above (keeps the repo's own origin untouched; this only affects git's
+# transport at invocation time).
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/

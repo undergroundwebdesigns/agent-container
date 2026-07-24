@@ -159,7 +159,9 @@ RUN chmod +x /home/$USERNAME/.local/bin/statusline
 COPY ./claude-config/claude.json /home/claude/.claude/.claude.json
 RUN chmod 444 /home/claude/.claude/.claude.json
 COPY ./claude-config/.gitconfig /home/claude/.gitconfig
-RUN chmod 444 /home/claude/.gitconfig
+# Per-org github token router referenced by .gitconfig's credential helper.
+COPY ./.devcontainer/bin/git-credential-smile-router /usr/local/bin/git-credential-smile-router
+RUN chmod 555 /usr/local/bin/git-credential-smile-router
 
 COPY ./claude-config/settings.json /home/claude/.claude/settings.json
 RUN chmod 444 /home/claude/.claude/settings.json
@@ -172,6 +174,11 @@ COPY ./claude-config/agents/* /home/claude/.claude/agents/
 RUN chmod 444 /home/claude/.claude/agents/*
 
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
+
+# Lock the gitconfig root-owned + read-only AFTER the recursive chown above,
+# so no session can chmod/rewrite it. All git config changes go through this
+# repo and a rebuild. (git reads a root-owned global config fine.)
+RUN chown root:root /home/claude/.gitconfig && chmod 444 /home/claude/.gitconfig
 
 # Copy and set up firewall script + entrypoint
 COPY ./.devcontainer/init-firewall.sh /usr/local/bin/
